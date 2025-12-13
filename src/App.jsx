@@ -1,29 +1,29 @@
-import { baseDatos } from "./base_datos"
+import { useState, useEffect } from "react";
+import Login from "./components/Login";
+import Dashboard from "./components/Dashboard";
 
 export default function App() {
- return (
-  <table className="table">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Nombre del activo</th>
-        <th scope="col">Ubicacion</th>
-        <th scope="col">Estado</th>
-      </tr>
-    </thead>
-    
-    <tbody>
-      {
-        baseDatos.map(activo => (
-          <tr key={activo.id}>
-            <td>{activo.id}</td>
-            <td>{activo.nombreActivo}</td>
-            <td>{activo.ubicacion}</td>
-            <td>{activo.estado}</td>
-          </tr>
-        ))
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const raw = localStorage.getItem("user");
+    if (token && raw) {
+      try {
+        setUser(JSON.parse(raw));
+      } catch {
+        localStorage.clear();
       }
-    </tbody>
-  </table>
- )
+    }
+  }, []);
+
+  const handleLogin = (u) => setUser(u);
+  const handleLogout = () => {
+    localStorage.clear();
+    setUser(null);
+  };
+
+  if (!user) return <Login onLogin={handleLogin} />;
+
+  return <Dashboard user={user} onLogout={handleLogout} />;
 }
